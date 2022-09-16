@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--        boardNo, title, content, regdate, hits -->
+<mapper namespace="com.example.board.home.impl.BoardMapper">
+    <insert id="createBoard">
+        INSERT INTO board VALUES(((SELECT IFNULL(MAX(boardNo),0) FROM board ALIAS_FOR_SUBQUERY)+1), #{title}, #{content}, NOW(), 0, #{boardName})
+    </insert>
+    <select id="listBoard" resultType="com.example.board.home.impl.BoardVO">
+--         SELECT boardNo, title, DATE_FORMAT(regdate, '%Y-%m-%d %H:%i') AS formatted_data, hits FROM board
+        SELECT boardNo, title, regdate, hits, boardName FROM board
+    </select>
+    <select id="readBoard" resultType="com.example.board.home.impl.BoardVO">
+        SELECT title, content, boardName FROM board WHERE boardNo=#{boardNo}
+    </select>
+    <update id="readBoardHits">
+        UPDATE board SET hits=hits+1 WHERE boardNo=#{boardNo}
+    </update>
+    <update id="updateBoard">
+        UPDATE board SET title=#{title}, content=#{content} WHERE boardNo=#{boardNo}
+    </update>
+    <delete id="deleteBoard">
+        DELETE FROM board WHERE boardNo=#{boardNo}
+    </delete>
+
+    <!-- user -->
+    <select id="loginUser" resultType="String" parameterType="String">
+        SELECT name FROM user_info WHERE id=#{id} and pw=#{pw}
+    </select>
+    <insert id="registerUser">
+        INSERT INTO user_info VALUES(#{id}, #{pw}, #{name}, #{birth}, #{gender}, #{email})
+    </insert>
+    <select id="idCheck" parameterType="String" resultType="int">
+        SELECT COUNT(id) FROM user_info WHERE id=#{id}
+    </select>
+</mapper>

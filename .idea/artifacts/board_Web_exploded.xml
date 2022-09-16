@@ -1,0 +1,41 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="board:Web exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/board_Web_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="board/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="board" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: javax.servlet:servlet-api:2.5" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-aop:5.1.9.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-beans:5.1.9.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-context:5.1.9.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-core:5.1.9.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-expression:5.1.9.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-jcl:5.1.9.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-web:5.1.9.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-webmvc:5.1.9.RELEASE" />
+          <element id="library" level="project" name="Maven: javax.inject:javax.inject:1" />
+          <element id="library" level="project" name="Maven: org.mariadb.jdbc:mariadb-java-client:2.7.4" />
+          <element id="library" level="project" name="Maven: org.mybatis:mybatis-spring:2.0.3" />
+          <element id="library" level="project" name="Maven: commons-dbcp:commons-dbcp:1.4" />
+          <element id="library" level="project" name="Maven: commons-pool:commons-pool:1.5.4" />
+          <element id="library" level="project" name="Maven: org.mybatis:mybatis:3.3.1" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-jdbc:5.1.9.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-tx:5.1.9.RELEASE" />
+          <element id="library" level="project" name="Maven: jstl:jstl:1.2" />
+          <element id="library" level="project" name="Maven: org.apache.taglibs:taglibs-standard-impl:1.2.5" />
+          <element id="library" level="project" name="Maven: com.oracle.database.jdbc:ojdbc8:21.1.0.0" />
+          <element id="library" level="project" name="Maven: org.webjars:bootstrap:4.5.3" />
+          <element id="library" level="project" name="Maven: org.webjars:jquery:3.5.1" />
+          <element id="library" level="project" name="Maven: org.webjars:popper.js:1.16.0" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.9.2" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.9.0" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.9.2" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
