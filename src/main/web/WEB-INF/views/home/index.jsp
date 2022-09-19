@@ -33,7 +33,7 @@
     <tbody>
     <c:forEach items="${boardList}" var="boardList">
         <tr>
-            <td>${boardList.boardNo}</td>
+            <td>${boardList.ROWNUM}</td>
             <td>${boardList.boardName}</td>
             <td><a href="home/readBoard?boardNo=${boardList.boardNo}">${boardList.title}</a></td>
             <td>${boardList.regdate}</td>

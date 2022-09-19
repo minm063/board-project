@@ -9,7 +9,8 @@
     </insert>
     <select id="listBoard" resultType="com.example.board.home.impl.BoardVO">
 --         SELECT boardNo, title, DATE_FORMAT(regdate, '%Y-%m-%d %H:%i') AS formatted_data, hits FROM board
-        SELECT boardNo, title, regdate, hits, boardName FROM board
+--         SELECT boardNo, title, regdate, hits, boardName FROM board
+        SELECT A.* FROM (SELECT @ROWNUM:=@ROWNUM+1 AS ROWNUM, board.* FROM board, (SELECT @ROWNUM:=0) R ) A
     </select>
     <select id="readBoard" resultType="com.example.board.home.impl.BoardVO">
         SELECT title, content, boardName FROM board WHERE boardNo=#{boardNo}

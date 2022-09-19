@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 public class HomeController {
@@ -39,14 +40,14 @@ public class HomeController {
 
     @PostMapping("/applyLogin")
     public ModelAndView applyLogin(HttpServletRequest request,
-                             BoardVO vo) {
+                                   BoardVO vo) {
         ModelAndView mv = new ModelAndView();
         final String hashedPw = Hashing.sha256()
                 .hashString(vo.getPw(), StandardCharsets.UTF_8)
                 .toString();
         vo.setPw(hashedPw);
         String name = boardService.loginUser(vo);
-        System.out.println("name"+name);
+        System.out.println("name" + name);
         if (name == null) {
             mv.setViewName("redirect:/");
         } else {
@@ -138,16 +139,21 @@ public class HomeController {
     public ModelAndView readBoard(HttpServletRequest request) {
         ModelAndView mv = new ModelAndView();
         int boardNo = Integer.parseInt(request.getParameter("boardNo")); // ok
+        String user = "";
         List<BoardVO> boardRead = boardService.readBoard(boardNo);
+        String boardName = request.getParameter("boardName");
 
-        boardService.readBoardHits(boardNo);
 
         HttpSession session = request.getSession(false);
         if (session == null) {
             mv.setViewName("redirect:/home");
         } else {
-            String user = session.getAttribute("id").toString();
+            user = session.getAttribute("id").toString();
             mv.addObject("user", user);
+        }
+        if (!user.equals(boardName)) {
+            boardService.readBoardHits(boardNo);
+            System.out.println("user"+user+" boardName"+boardName);
         }
         mv.addObject("boardNo", boardNo); // boardNo 저장
         mv.addObject("boardRead", boardRead); // 글 내용
@@ -166,8 +172,7 @@ public class HomeController {
         System.out.println(session);
         if (session == null) {
             mv.setViewName("redirect:/");
-        }
-        else {
+        } else {
             mv.addObject("boardList", boardList);
             mv.addObject("boardNo", boardNo);
             mv.setViewName("/home/updateBoard");

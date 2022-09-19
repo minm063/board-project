@@ -12,6 +12,9 @@ public class BoardVO {
     int hits;
     String boardName;
 
+    // rowNum
+    int ROWNUM;
+
     /*
     user info
      */
@@ -23,6 +26,14 @@ public class BoardVO {
     String email;
 
     public BoardVO() {}
+
+    public int getROWNUM() {
+        return ROWNUM;
+    }
+
+    public void setROWNUM(int ROWNUM) {
+        this.ROWNUM = ROWNUM;
+    }
 
     public String getBoardName() {
         return boardName;
