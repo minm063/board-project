@@ -139,9 +139,9 @@ public class HomeController {
     public ModelAndView readBoard(HttpServletRequest request) {
         ModelAndView mv = new ModelAndView();
         int boardNo = Integer.parseInt(request.getParameter("boardNo")); // ok
-        String user = "";
-        List<BoardVO> boardRead = boardService.readBoard(boardNo);
         String boardName = request.getParameter("boardName");
+        List<BoardVO> boardRead = boardService.readBoard(boardNo);
+        String user = "";
 
 
         HttpSession session = request.getSession(false);

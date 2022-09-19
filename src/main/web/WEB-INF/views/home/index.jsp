@@ -35,7 +35,7 @@
         <tr>
             <td>${boardList.ROWNUM}</td>
             <td>${boardList.boardName}</td>
-            <td><a href="home/readBoard?boardNo=${boardList.boardNo}">${boardList.title}</a></td>
+            <td><a href="home/readBoard?boardNo=${boardList.boardNo}&boardName=${boardList.boardName}">${boardList.title}</a></td>
             <td>${boardList.regdate}</td>
             <td>${boardList.hits}</td>
         </tr>
