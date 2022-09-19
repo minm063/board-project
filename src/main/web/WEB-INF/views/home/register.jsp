@@ -22,17 +22,18 @@
 
     <h3><label for="pw">비밀번호</label></h3>
     <input type="password" name="pw" id="pw" aria-describedby="pwMsg" maxlength="16">
+    <button type="button" id="viewPw" >비밀번호 보기</button>
     <span id="pwMsg" aria-live="assertive" style="display: block;"></span>
 
     <h3><label for="pwCheck">비밀번호 재확인</label></h3>
-    <input type="text" name="pwCheck" id="pwCheck" aria-describedby="pwCheckMsg" maxlength="16" >
+    <input type="password" name="pwCheck" id="pwCheck" aria-describedby="pwCheckMsg" maxlength="16" >
     <span id="pwCheckMsg" aria-live="assertive" style="display: block;"></span>
 
     <h3><label for="name">이름</label></h3>
     <input type="text" name="name" id="name">
 
     <h3><label for="birth">생년월일</label></h3>
-    <input type="text" name="birth" id="birth" aria-label="생년월일(8자)" placeholder="생년월일(8자)" maxlength="8" >
+    <input type="date" name="birth" id="birth" aria-label="생년월일(8자)" placeholder="생년월일(8자)" maxlength="8" >
     <span id="birthMsg" style="display: block;"></span>
 
     <h3><label for="gender">성별</label></h3>
@@ -43,7 +44,7 @@
     </select>
 
     <h3><label for="email">이메일</label></h3><p style="color: gray;">(선택 사항)</p>
-    <input type="text" id="email" name="email" >
+    <input type="email" id="email" name="email" >
 
     <input type="submit" value="가입하기" id="submit" >
 </form>

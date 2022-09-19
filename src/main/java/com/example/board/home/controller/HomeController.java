@@ -2,14 +2,15 @@ package com.example.board.home.controller;
 
 import com.example.board.home.impl.BoardServiceImpl;
 import com.example.board.home.impl.BoardVO;
+import com.google.common.hash.Hashing;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Controller
@@ -40,6 +41,10 @@ public class HomeController {
     public ModelAndView applyLogin(HttpServletRequest request,
                              BoardVO vo) {
         ModelAndView mv = new ModelAndView();
+        final String hashedPw = Hashing.sha256()
+                .hashString(vo.getPw(), StandardCharsets.UTF_8)
+                .toString();
+        vo.setPw(hashedPw);
         String name = boardService.loginUser(vo);
         System.out.println("name"+name);
         if (name == null) {
@@ -72,7 +77,10 @@ public class HomeController {
     @PostMapping("/applyRegister")
     public ModelAndView applyRegister(BoardVO vo) {
         ModelAndView mv = new ModelAndView();
-
+        final String hashedPw = Hashing.sha256()
+                .hashString(vo.getPw(), StandardCharsets.UTF_8)
+                .toString();
+        vo.setPw(hashedPw);
         boardService.registerUser(vo);
         mv.setViewName("redirect:/");
         return mv;
