@@ -1,21 +1,34 @@
 package com.example.board.home.controller;
 
+import com.example.board.home.AttachedFile;
 import com.example.board.home.impl.BoardServiceImpl;
 import com.example.board.home.impl.BoardVO;
+import com.example.board.home.impl.FileVO;
 import com.google.common.hash.Hashing;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Controller
 public class HomeController {
+    @Resource(name = "uploadPath")
+    String uploadPath;
     private final BoardServiceImpl boardService;
 
     public HomeController(BoardServiceImpl boardService) {
@@ -42,12 +55,15 @@ public class HomeController {
     public ModelAndView applyLogin(HttpServletRequest request,
                                    BoardVO vo) {
         ModelAndView mv = new ModelAndView();
+
+        // hashedPw
         final String hashedPw = Hashing.sha256()
                 .hashString(vo.getPw(), StandardCharsets.UTF_8)
                 .toString();
         vo.setPw(hashedPw);
+
+        // signin
         String name = boardService.loginUser(vo);
-        System.out.println("name" + name);
         if (name == null) {
             mv.setViewName("redirect:/");
         } else {
@@ -57,6 +73,7 @@ public class HomeController {
             session.setAttribute("isLogin", true);
             mv.setViewName("redirect:/home");
         }
+
         return mv;
     }
 
@@ -97,20 +114,41 @@ public class HomeController {
     CRUD 게시판
     0901~0907
      */
-    @GetMapping(value = "/home")
-    public ModelAndView home(HttpServletRequest request) {
+    @RequestMapping(value = "/home")
+    public ModelAndView home(HttpServletRequest request, BoardVO vo) {
         ModelAndView mv = new ModelAndView();
-
-        List<BoardVO> boardList = boardService.listBoard();
+//            select 문에서 WHERE regDate>=date_add(now(), interval -1 day))인 boardNo
+//         뿌릴 때 if 문
+//         인자 넘겨서 ${not empty regDateMessage} =>
+        // signin
         HttpSession session = request.getSession(false);
         if (session != null) {
             // 로그인 되어있는 계정 name
             mv.addObject("user", session.getAttribute("id"));
         }
-        mv.setViewName("home/index");
+        // page
+        int pageNo;
+        try {
+            pageNo = Integer.parseInt(request.getParameter("pageNo"));
+            System.out.println("try:"+pageNo);
+        } catch (Exception e) {
+            pageNo = 1;
+        }
+        int totalCount = boardService.listCount(vo);
+        vo.setTotalCount(totalCount, pageNo);
+        mv.addObject("page", vo);
+
+        List<BoardVO> boardList = boardService.listBoard(vo.getStartRowNo(), vo.getEndRowNo());
         mv.addObject("boardList", boardList);
 
+        mv.setViewName("home/index");
         return mv;
+    }
+
+    @PostMapping("/home/pageSubmit")
+    public List<BoardVO> pageSubmit(@RequestParam("data") int page, BoardVO vo) {
+        vo.setPage(page);
+        return boardService.listBoard(vo.getStartRowNo(), vo.getEndRowNo());
     }
 
     // 작성 페이지
@@ -129,21 +167,27 @@ public class HomeController {
 
     // 작성 확인
     @PostMapping("/home/applyInsert")
-    public String insertBoard(BoardVO vo) {
+    public ModelAndView insertBoard(BoardVO vo, @RequestParam("file") MultipartFile file, HttpServletRequest request) {
+        AttachedFile attachedFile = new AttachedFile();
+        ModelAndView mv = new ModelAndView();
+
+        attachedFile.uploadFile(request, file);
         boardService.createBoard(vo);
-        return "redirect:/home";
+        mv.setViewName("redirect:/home");
+
+        return mv;
     }
 
     // 상세 페이지
     @GetMapping("/home/readBoard")
-    public ModelAndView readBoard(HttpServletRequest request) {
+    public ModelAndView readBoard(HttpServletRequest request, BoardVO vo) {
         ModelAndView mv = new ModelAndView();
+        AttachedFile af = new AttachedFile();
         int boardNo = Integer.parseInt(request.getParameter("boardNo")); // ok
         String boardName = request.getParameter("boardName");
         List<BoardVO> boardRead = boardService.readBoard(boardNo);
         String user = "";
-
-
+        
         HttpSession session = request.getSession(false);
         if (session == null) {
             mv.setViewName("redirect:/home");
@@ -153,12 +197,19 @@ public class HomeController {
         }
         if (!user.equals(boardName)) {
             boardService.readBoardHits(boardNo);
-            System.out.println("user"+user+" boardName"+boardName);
+            System.out.println("user" + user + " boardName" + boardName);
         }
+        af.getFile(vo.getRegdate(), request);
         mv.addObject("boardNo", boardNo); // boardNo 저장
         mv.addObject("boardRead", boardRead); // 글 내용
         mv.setViewName("/home/readBoard");
+
         return mv;
+    }
+
+    @RequestMapping("/home/fileDownload")
+    public void fileDownload(@RequestParam("fileName") String fileName) {
+
     }
 
     @GetMapping("/home/updateBoard")
@@ -191,6 +242,17 @@ public class HomeController {
     public String applyUpdate(@RequestParam("boardNo") int boardNo, BoardVO vo) {
         vo.setBoardNo(boardNo);
         boardService.updateBoard(vo);
+
+        // file
+        MultipartFile multipartFile = vo.getUploadFile();
+        if (!multipartFile.isEmpty()) {
+            String fileName = multipartFile.getOriginalFilename();
+            try {
+                multipartFile.transferTo(new File(uploadPath + fileName));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return "redirect:/home";
     }
 

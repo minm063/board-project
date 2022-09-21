@@ -8,27 +8,35 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="false" %>
 <html>
+<link rel="stylesheet" href="/static/index.css">
+
 <head>
     <title>read</title>
 </head>
 <body>
 <c:forEach items="${boardRead}" var="boardRead">
-    <h1>${boardRead.title}</h1>
-    <p>${boardRead.content}</p>
+    <label for="boardRead" class="boardFooter" >
+        <input type="text" value=${boardRead.title} readonly>
+        <input type="text" value=${boardRead.boardName} readOnly>
+        <textarea cols="30" rows="10" id="boardRead" readonly>${boardRead.content}</textarea>
+        <input type="file" id="download" value=${fileName}>
+    </label>
     <c:set var="name" value="${boardRead.boardName}"/>
 </c:forEach>
-<a href="${pageContext.request.contextPath}/home/updateBoard?boardNo=${boardNo}" id="update">수정</a>
-<a href="${pageContext.request.contextPath}/home/deleteBoard?boardNo=${boardNo}" id="delete">삭제</a>
-<a href="${pageContext.request.contextPath}/home" class="btn">목록</a>
+<a href="${pageContext.request.contextPath}/home/updateBoard?boardNo=${boardNo}" id="update"><button>수정</button></a>
+<a href="${pageContext.request.contextPath}/home/deleteBoard?boardNo=${boardNo}" id="delete"><button>삭제</button></a>
+<a href="${pageContext.request.contextPath}/home" ><button>목록</button></a>
 </body>
 <script>
     // user : 현재 접속해있는 사용자
     // name : 글 작성자
-    <%--console.log("${name}");--%>
-    <%--console.log(typeof ${user});--%>
     <c:if test="${name != user}">
     document.getElementById('delete').style.display = "none";
     document.getElementById('update').style.display = "none";
     </c:if>
+    document.querySelector('#download').addEventListener('click', (e) => {
+        const fileName = $(this).attr("href");
+        window.location = "home/fileDown?fileName=" + fileName;
+    });
 </script>
 </html>

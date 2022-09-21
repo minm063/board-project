@@ -1,24 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:beans="http://www.springframework.org/schema/c"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="org.mariadb.jdbc.Driver" />
-        <property name="url" value="jdbc:mariadb://comin.com:8306/first" />
-        <property name="username" value="first_id" />
-        <property name="password" value="first_pw" />
+        <property name="driverClassName" value="org.mariadb.jdbc.Driver"/>
+        <property name="url" value="jdbc:mariadb://comin.com:8306/first"/>
+        <property name="username" value="first_id"/>
+        <property name="password" value="first_pw"/>
     </bean>
 
     <!-- mybatis setting -->
     <bean id="boardScanner" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
-        <property name="configLocation" value="classpath:sql-map-config.xml" />
-        <property name="mapperLocations" value="classpath:board-mapping.xml" />
+        <property name="configLocation" value="classpath:sql-map-config.xml"/>
+        <property name="mapperLocations" value="classpath:board-mapping.xml"/>
     </bean>
 
     <!-- mapper -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.example.board.home.impl" /> <!--//mapper 가 있는 풀 패키지명 -->
+        <property name="basePackage" value="com.example.board.home.impl"/> <!--//mapper 가 있는 풀 패키지명 -->
+    </bean>
+
+    <!-- file uploader -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="-1" />
+        <property name="defaultEncoding" value="UTF-8" />
+    </bean>
+
+    <bean id="uploadPath" class="java.lang.String">
+        <constructor-arg value="C:\projects\intelliJ-workspace\board\src\main\web\resources\upload-folder" />
     </bean>
 </beans>

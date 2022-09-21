@@ -7,7 +7,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="false" %>
-<html href="/static/signin.html">
+<html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -50,7 +50,7 @@
     <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
     <p class="mt-5 mb-3 text-muted">&copy; 2017-2020</p>
 </form>
-<a href="register" ><button>회원가입</button></a>
+<a href="register" ><button class="btn btn-lg btn-primary btn-block">회원가입</button></a>
 <script>
     <c:if test="${not empty errorMessage}">
     alert("${errorMessage}");

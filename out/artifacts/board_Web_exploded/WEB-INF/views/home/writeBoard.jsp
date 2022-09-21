@@ -14,14 +14,15 @@
     <title>Write</title>
 </head>
 <body>
-<form action="/home/applyInsert" method="post">
+<form action="${pageContext.request.contextPath}/home/applyInsert" method="post" enctype="multipart/form-data">
     <label class="boardFooter">
-        <input class="title" type="text" name="title" placeholder="title" />
+        <input class="title" type="text" name="title" placeholder="title"/>
         <input type="text" name="boardName" value=${user} readonly>
-        <textarea class="content" name="content" cols="50" rows="20" placeholder="input text" ></textarea>
+        <textarea class="content" name="content" cols="50" rows="20" placeholder="input text"></textarea>
+        <input type="file" name="file" />
     </label>
     <input type="submit" value="등록">
-    <a href="${pageContext.request.contextPath}/home"><input type="button" value="취소"></a>
+<a href="${pageContext.request.contextPath}/home"><input type="button" value="취소"></a>
 </form>
 </body>
 </html>

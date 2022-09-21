@@ -1,15 +1,27 @@
 package com.example.board.home.impl;
 
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Objects;
 
 @Service("BoardService")
 public class BoardServiceImpl implements BoardMapper{
 
     @Resource(name = "BoardMapper")
     private BoardMapper boardMapper;
+
 
     @Override
     public String loginUser(BoardVO vo) {
@@ -31,8 +43,8 @@ public class BoardServiceImpl implements BoardMapper{
     }
 
     @Override
-    public List<BoardVO> listBoard() {
-        return boardMapper.listBoard();
+    public List<BoardVO> listBoard(@Param("startRowNo") int startRowNo, @Param("endRowNo") int endRowNo) {
+        return boardMapper.listBoard(startRowNo, endRowNo);
     }
 
     @Override
@@ -54,6 +66,10 @@ public class BoardServiceImpl implements BoardMapper{
     public void deleteBoard(int boardNo) {
         boardMapper.deleteBoard(boardNo);
     }
+
+    @Override
+    public int listCount(BoardVO vo) {return boardMapper.listCount(vo);}
+
 
 //    @Autowired
 //    BoardDAO boardDAO;

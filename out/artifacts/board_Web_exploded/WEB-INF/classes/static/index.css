@@ -17,3 +17,7 @@ th:first-child, td:first-child {
 .btn {
     float: right;
 }
+textarea{
+    width: 348px;
+    height: 258px;
+}

@@ -8,9 +8,9 @@
         INSERT INTO board VALUES(((SELECT IFNULL(MAX(boardNo),0) FROM board ALIAS_FOR_SUBQUERY)+1), #{title}, #{content}, NOW(), 0, #{boardName})
     </insert>
     <select id="listBoard" resultType="com.example.board.home.impl.BoardVO">
---         SELECT boardNo, title, DATE_FORMAT(regdate, '%Y-%m-%d %H:%i') AS formatted_data, hits FROM board
 --         SELECT boardNo, title, regdate, hits, boardName FROM board
-        SELECT A.* FROM (SELECT @ROWNUM:=@ROWNUM+1 AS ROWNUM, board.* FROM board, (SELECT @ROWNUM:=0) R ) A
+--         SELECT A.* FROM (SELECT @ROWNUM:=@ROWNUM+1 AS ROWNUM, board.* FROM board, (SELECT @ROWNUM:=0) R ) A
+        SELECT A.* FROM (SELECT @ROWNUM:=@ROWNUM+1 AS ROWNUM, board.* FROM board, (SELECT @ROWNUM:=0) R ) A WHERE A.ROWNUM BETWEEN #{startRowNo} AND #{endRowNo}
     </select>
     <select id="readBoard" resultType="com.example.board.home.impl.BoardVO">
         SELECT title, content, boardName FROM board WHERE boardNo=#{boardNo}
@@ -34,5 +34,10 @@
     </insert>
     <select id="idCheck" parameterType="String" resultType="int">
         SELECT COUNT(id) FROM user_info WHERE id=#{id}
+    </select>
+
+    <select id="listCount" resultType="int">
+        SELECT COUNT(*) FROM board WHERE 1=1
+        <!-- 검색 -->
     </select>
 </mapper>

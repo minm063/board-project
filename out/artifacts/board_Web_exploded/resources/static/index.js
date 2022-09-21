@@ -5,7 +5,8 @@ const pwCheck = document.querySelector('#pwCheck');
 const name = document.querySelector('#name');
 const birth = document.querySelector('#birth');
 const hwp = /[^0-9a-zA-Z-_]/g;
-const openPw = document.querySelector('#viewPw');
+const openPw = document.querySelector('.viewPw');
+const togglePw = document.querySelectorAll('.togglePw');
 // const hwp = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
 let flag1, flag2, flag3, flag4;
 // const submit = document.querySelector('#submit');
@@ -136,14 +137,20 @@ idCheck.addEventListener('keyup', (e) => {
     console.log(targetValue);
 });
 //
-openPw.addEventListener('click', evt => {
-    pw.toggleAttribute('activate');
-    if (pw.hasAttribute('activate')) {
-        pw.setAttribute('type', 'text');
-        openPw.textContent = '비밀번호 숨기기';
-    }
-    else {
-        pw.setAttribute('type', 'password');
-        openPw.textContent = '비밀번호 보이기';
-    }
+openPw.addEventListener('click', (e) => {
+    togglePw.forEach(tEl => {
+        tEl.toggleAttribute('activate');
+        if (tEl.hasAttribute('activate')) {
+            tEl.setAttribute('type', 'text');
+            openPw.textContent = '비밀번호 숨기기';
+        }
+        else {
+            tEl.setAttribute('type', 'password');
+            openPw.textContent = '비밀번호 보이기';
+        }
+    })
 });
+//
+// document.querySelector('#back').addEventListener('click', (e) => {
+//
+// });
