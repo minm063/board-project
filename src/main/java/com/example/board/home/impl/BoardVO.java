@@ -20,6 +20,7 @@ public class BoardVO extends pageVO{
     int ROWNUM;
     //
     MultipartFile uploadFile;
+    String fileName;
     /*
     user info
      */
@@ -31,6 +32,14 @@ public class BoardVO extends pageVO{
     String email;
 
     public BoardVO() {}
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
     public MultipartFile getUploadFile() {
         return uploadFile;

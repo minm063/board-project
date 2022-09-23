@@ -1,5 +1,6 @@
 package com.example.board.home;
 
+import com.example.board.home.impl.BoardVO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,15 +17,17 @@ import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
 
 public class AttachedFile {
 
     private BasicFileAttributes attributes;
 
     public void uploadFile(HttpServletRequest request, MultipartFile file) {
+        String temp = UUID.randomUUID().toString();
         Path serverPath = Paths.get(request.getSession().getServletContext().getRealPath(File.separator) + File.separator
-                + "crud" + File.separator + StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
-        System.out.println("serverPath : " + serverPath);
+                + "crud" + File.separator + temp + "_" + StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
+
         if (!Files.exists(serverPath)) {
             try {
                 Files.createDirectories(serverPath.getParent());
@@ -39,28 +42,31 @@ public class AttachedFile {
         }
     }
 
-    public void getFile(Date regDate, HttpServletRequest request) {
+    public void getFile(BoardVO vo, HttpServletRequest request) {
+        System.out.println(vo.getFileName());
+        System.out.println(request.getAttribute(vo.getFileName()));
         Path serverPath = Paths.get(request.getSession().getServletContext().getRealPath(File.separator) + File.separator
-                + "crud" + File.separator);
+                + "crud" + File.separator + vo.getFileName());
         System.out.println("serverPath : " + serverPath);
-        if (!Files.exists(serverPath)) {
-            return;
-        }
-        try {
-            attributes = Files.readAttributes(serverPath, BasicFileAttributes.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (attributes != null) {
-            FileTime fileTime = attributes.creationTime();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-            String formatFileTime = dateFormat.format(fileTime.toMillis());
-            System.out.println(formatFileTime);
+//        if (!Files.exists(serverPath)) {
+//            return;
+//        }
 
-            if (formatFileTime.equals(regDate.toString())) {
-                System.out.println("ok");
-            }
-        }
+//        try {
+//            attributes = Files.readAttributes(serverPath, BasicFileAttributes.class);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        if (attributes != null) {
+//            FileTime fileTime = attributes.creationTime();
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+//            String formatFileTime = dateFormat.format(fileTime.toMillis());
+//            System.out.println(formatFileTime);
+//
+//            if (formatFileTime.equals(vo.getRegdate().toString())) {
+//                System.out.println("ok");
+//            }
+//        }
     }
 
     public void deleteFile(MultipartFile file, HttpServletRequest request)

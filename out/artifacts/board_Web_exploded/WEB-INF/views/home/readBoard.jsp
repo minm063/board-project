@@ -15,17 +15,26 @@
 </head>
 <body>
 <c:forEach items="${boardRead}" var="boardRead">
-    <label for="boardRead" class="boardFooter" >
+    <label for="boardRead" class="boardFooter">
         <input type="text" value=${boardRead.title} readonly>
         <input type="text" value=${boardRead.boardName} readOnly>
         <textarea cols="30" rows="10" id="boardRead" readonly>${boardRead.content}</textarea>
-        <input type="file" id="download" value=${fileName}>
+        <c:if test="${not empty boardRead.fileName}">
+<%--            <a href="http://localhost:8080/home/fileDownload" id="download">${boardRead.fileName}</a>--%>
+            <a href="/home/fileDownload?fileName=${boardRead.fileName}" >${boardRead.fileName}</a>
+        </c:if>
     </label>
     <c:set var="name" value="${boardRead.boardName}"/>
 </c:forEach>
-<a href="${pageContext.request.contextPath}/home/updateBoard?boardNo=${boardNo}" id="update"><button>수정</button></a>
-<a href="${pageContext.request.contextPath}/home/deleteBoard?boardNo=${boardNo}" id="delete"><button>삭제</button></a>
-<a href="${pageContext.request.contextPath}/home" ><button>목록</button></a>
+<a href="${pageContext.request.contextPath}/home/updateBoard?boardNo=${boardNo}" id="update">
+    <button>수정</button>
+</a>
+<a href="${pageContext.request.contextPath}/home/deleteBoard?boardNo=${boardNo}" id="delete">
+    <button>삭제</button>
+</a>
+<a href="${pageContext.request.contextPath}/home">
+    <button>목록</button>
+</a>
 </body>
 <script>
     // user : 현재 접속해있는 사용자
@@ -34,9 +43,5 @@
     document.getElementById('delete').style.display = "none";
     document.getElementById('update').style.display = "none";
     </c:if>
-    document.querySelector('#download').addEventListener('click', (e) => {
-        const fileName = $(this).attr("href");
-        window.location = "home/fileDown?fileName=" + fileName;
-    });
 </script>
 </html>

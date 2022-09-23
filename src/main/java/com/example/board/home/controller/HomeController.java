@@ -1,29 +1,26 @@
 package com.example.board.home.controller;
 
-import com.example.board.home.AttachedFile;
 import com.example.board.home.impl.BoardServiceImpl;
 import com.example.board.home.impl.BoardVO;
-import com.example.board.home.impl.FileVO;
 import com.google.common.hash.Hashing;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.sql.Date;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Objects;
+import java.util.UUID;
 
 @Controller
 public class HomeController {
@@ -34,6 +31,13 @@ public class HomeController {
     public HomeController(BoardServiceImpl boardService) {
         this.boardService = boardService;
     }
+
+    private Path getPath(HttpServletRequest request, String name) {
+        Path serverPath = Paths.get(request.getSession().getServletContext().getRealPath(File.separator) + File.separator
+                + "crud" + File.separator + name);
+        return serverPath;
+    }
+
 
     /*
     회원가입, 로그인
@@ -167,11 +171,39 @@ public class HomeController {
 
     // 작성 확인
     @PostMapping("/home/applyInsert")
-    public ModelAndView insertBoard(BoardVO vo, @RequestParam("file") MultipartFile file, HttpServletRequest request) {
-        AttachedFile attachedFile = new AttachedFile();
+    public ModelAndView insertBoard(BoardVO vo, @RequestParam("uploadFile") MultipartFile file, HttpServletRequest request) {
         ModelAndView mv = new ModelAndView();
+        String name = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path serverPath = getPath(request, name);
+        System.out.println(serverPath);
 
-        attachedFile.uploadFile(request, file);
+        if (!Files.exists(serverPath)) {
+            try {
+                Files.createDirectories(serverPath.getParent());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            Files.copy(file.getInputStream(), serverPath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // boostCourse
+//        try (
+//            FileOutputStream stream = new FileOutputStream(request.getSession().getServletContext().getRealPath(File.separator) + File.separator + "crud" + File.separator + file.getOriginalFilename());
+//            InputStream inputStream = file.getInputStream();
+//        ) {
+//            int readCount = 0;
+//            byte[] buffer = new byte[1024];
+//            while((readCount = inputStream.read(buffer)) != -1) {
+//                stream.write(buffer, 0, readCount);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+        vo.setFileName(name);
         boardService.createBoard(vo);
         mv.setViewName("redirect:/home");
 
@@ -180,14 +212,13 @@ public class HomeController {
 
     // 상세 페이지
     @GetMapping("/home/readBoard")
-    public ModelAndView readBoard(HttpServletRequest request, BoardVO vo) {
+    public ModelAndView readBoard(HttpServletRequest request) {
         ModelAndView mv = new ModelAndView();
-        AttachedFile af = new AttachedFile();
         int boardNo = Integer.parseInt(request.getParameter("boardNo")); // ok
         String boardName = request.getParameter("boardName");
         List<BoardVO> boardRead = boardService.readBoard(boardNo);
         String user = "";
-        
+
         HttpSession session = request.getSession(false);
         if (session == null) {
             mv.setViewName("redirect:/home");
@@ -197,9 +228,7 @@ public class HomeController {
         }
         if (!user.equals(boardName)) {
             boardService.readBoardHits(boardNo);
-            System.out.println("user" + user + " boardName" + boardName);
         }
-        af.getFile(vo.getRegdate(), request);
         mv.addObject("boardNo", boardNo); // boardNo 저장
         mv.addObject("boardRead", boardRead); // 글 내용
         mv.setViewName("/home/readBoard");
@@ -208,7 +237,55 @@ public class HomeController {
     }
 
     @RequestMapping("/home/fileDownload")
-    public void fileDownload(@RequestParam("fileName") String fileName) {
+    public void fileDownload(HttpServletResponse response, HttpServletRequest request) {
+
+//        try {
+//            String originName = URLDecoder.decode(fileName, "UTF-8");
+//            FileSystemResource file = new FileSystemResource(request.getSession().getServletContext().getRealPath(File.separator) + File.separator
+//                    + "crud" + File.separator + originName);
+//            System.out.println("1: " + originName);
+//            if (!file.exists()) {
+//                // NOT_FOUND
+//            }
+//            System.out.println("2 : "+originName.substring(originName.lastIndexOf("_"))+1);
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+        String fileName = request.getParameter("fileName");
+        System.out.println(fileName);
+        String path = getPath(request, fileName).toString();
+        File file = new File(path);
+        response.setHeader("Content-Disposition", "attachment;filename=" + file.getName()); // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
+
+        FileInputStream fileInputStream = null; // 파일 읽어오기
+        try {
+            fileInputStream = new FileInputStream(path);
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        OutputStream out = null;
+        try {
+            out = response.getOutputStream();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        int read = 0;
+        byte[] buffer = new byte[1024];
+        while (true) {
+            try {
+                if (fileInputStream != null && (read = fileInputStream.read(buffer)) == -1) break;
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } // 1024바이트씩 계속 읽으면서 outputStream에 저장, -1이 나오면 더이상 읽을 파일이 없음
+            try {
+                if (out != null) {
+                    out.write(buffer, 0, read);
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
 
     }
 
