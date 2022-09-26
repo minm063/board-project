@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%--
   Created by IntelliJ IDEA.
   User: bma01
@@ -20,8 +21,10 @@
         <input type="text" value=${boardRead.boardName} readOnly>
         <textarea cols="30" rows="10" id="boardRead" readonly>${boardRead.content}</textarea>
         <c:if test="${not empty boardRead.fileName}">
-<%--            <a href="http://localhost:8080/home/fileDownload" id="download">${boardRead.fileName}</a>--%>
-            <a href="/home/fileDownload?fileName=${boardRead.fileName}" >${boardRead.fileName}</a>
+            <c:forEach var="fileNames" items="${fn:split(boardRead.fileName, ',')}">
+                <a href="${pageContext.request.contextPath}/home/fileDownload?fileName=${fileNames}">${fileNames}</a><br>
+            </c:forEach>
+            <%--            <a href="http://localhost:8080/home/fileDownload" id="download">${boardRead.fileName}</a>--%>
         </c:if>
     </label>
     <c:set var="name" value="${boardRead.boardName}"/>
@@ -29,7 +32,8 @@
 <a href="${pageContext.request.contextPath}/home/updateBoard?boardNo=${boardNo}" id="update">
     <button>수정</button>
 </a>
-<a href="${pageContext.request.contextPath}/home/deleteBoard?boardNo=${boardNo}" id="delete">
+<a href="${pageContext.request.contextPath}/home/deleteBoard?boardNo=${boardNo}" id="delete"
+   onclick="return confirm('정말로 삭제하시겠습니까?')">
     <button>삭제</button>
 </a>
 <a href="${pageContext.request.contextPath}/home">

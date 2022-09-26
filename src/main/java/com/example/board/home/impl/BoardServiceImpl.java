@@ -70,6 +70,12 @@ public class BoardServiceImpl implements BoardMapper{
     @Override
     public int listCount(BoardVO vo) {return boardMapper.listCount(vo);}
 
+    @Override
+    public String getFileName(int boardNo) {
+        return boardMapper.getFileName(boardNo);
+    }
+
+
 
 //    @Autowired
 //    BoardDAO boardDAO;

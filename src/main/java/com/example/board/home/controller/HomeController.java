@@ -1,8 +1,10 @@
 package com.example.board.home.controller;
 
+import com.example.board.home.AttachedFile;
 import com.example.board.home.impl.BoardServiceImpl;
 import com.example.board.home.impl.BoardVO;
 import com.google.common.hash.Hashing;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,11 +35,11 @@ public class HomeController {
         this.boardService = boardService;
     }
 
-    private Path getPath(HttpServletRequest request, String name) {
-        Path serverPath = Paths.get(request.getSession().getServletContext().getRealPath(File.separator) + File.separator
-                + "crud" + File.separator + name);
-        return serverPath;
-    }
+//    private Path getPath(HttpServletRequest request, String name) {
+//        Path serverPath = Paths.get(request.getSession().getServletContext().getRealPath(File.separator) + File.separator
+//                + "crud" + File.separator + name);
+//        return serverPath;
+//    }
 
 
     /*
@@ -171,39 +174,45 @@ public class HomeController {
 
     // 작성 확인
     @PostMapping("/home/applyInsert")
-    public ModelAndView insertBoard(BoardVO vo, @RequestParam("uploadFile") MultipartFile file, HttpServletRequest request) {
+    public ModelAndView insertBoard(BoardVO vo, @RequestParam(value = "uploadFile", required = false) MultipartFile[] file, HttpServletRequest request) {
         ModelAndView mv = new ModelAndView();
-        String name = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path serverPath = getPath(request, name);
-        System.out.println(serverPath);
+        AttachedFile af = new AttachedFile();
 
-        if (!Files.exists(serverPath)) {
-            try {
-                Files.createDirectories(serverPath.getParent());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        try {
-            Files.copy(file.getInputStream(), serverPath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        // boostCourse
-//        try (
-//            FileOutputStream stream = new FileOutputStream(request.getSession().getServletContext().getRealPath(File.separator) + File.separator + "crud" + File.separator + file.getOriginalFilename());
-//            InputStream inputStream = file.getInputStream();
-//        ) {
-//            int readCount = 0;
-//            byte[] buffer = new byte[1024];
-//            while((readCount = inputStream.read(buffer)) != -1) {
-//                stream.write(buffer, 0, readCount);
+        if (file != null) {
+            af.uploadFile(file, request, vo);
+//            String name = UUID.randomUUID() + "_" + file.getOriginalFilename();
+//            Path serverPath = getPath(request, name);
+//            System.out.println(serverPath);
+//
+//            if (!Files.exists(serverPath)) {
+//                try {
+//                    Files.createDirectories(serverPath.getParent());
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
 //            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+//            try {
+//                Files.copy(file.getInputStream(), serverPath, StandardCopyOption.REPLACE_EXISTING);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            // boostCourse
+////        try (
+////            FileOutputStream stream = new FileOutputStream(request.getSession().getServletContext().getRealPath(File.separator) + File.separator + "crud" + File.separator + file.getOriginalFilename());
+////            InputStream inputStream = file.getInputStream();
+////        ) {
+////            int readCount = 0;
+////            byte[] buffer = new byte[1024];
+////            while((readCount = inputStream.read(buffer)) != -1) {
+////                stream.write(buffer, 0, readCount);
+////            }
+////        } catch (IOException e) {
+////            e.printStackTrace();
+////        }
+//
+//            vo.setFileName(name);
+        }
 
-        vo.setFileName(name);
         boardService.createBoard(vo);
         mv.setViewName("redirect:/home");
 
@@ -251,39 +260,43 @@ public class HomeController {
 //        } catch (UnsupportedEncodingException e) {
 //            e.printStackTrace();
 //        }
-        String fileName = request.getParameter("fileName");
-        System.out.println(fileName);
-        String path = getPath(request, fileName).toString();
-        File file = new File(path);
-        response.setHeader("Content-Disposition", "attachment;filename=" + file.getName()); // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
+        String name = request.getParameter("fileName");
+        String[] files = name.split(",");
+        for (String fileName: files) {
 
-        FileInputStream fileInputStream = null; // 파일 읽어오기
-        try {
-            fileInputStream = new FileInputStream(path);
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        }
-        OutputStream out = null;
-        try {
-            out = response.getOutputStream();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+            String path = Paths.get(request.getSession().getServletContext().getRealPath(File.separator) + File.separator
+                    + "crud" + File.separator + fileName).toString();
+            File file = new File(path);
+            response.setHeader("Content-Disposition", "attachment;filename=" + file.getName()); // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
 
-        int read = 0;
-        byte[] buffer = new byte[1024];
-        while (true) {
+            FileInputStream fileInputStream = null; // 파일 읽어오기
             try {
-                if (fileInputStream != null && (read = fileInputStream.read(buffer)) == -1) break;
+                fileInputStream = new FileInputStream(path);
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+            OutputStream out = null;
+            try {
+                out = response.getOutputStream();
             } catch (IOException ex) {
                 ex.printStackTrace();
-            } // 1024바이트씩 계속 읽으면서 outputStream에 저장, -1이 나오면 더이상 읽을 파일이 없음
-            try {
-                if (out != null) {
-                    out.write(buffer, 0, read);
+            }
+
+            int read = 0;
+            byte[] buffer = new byte[1024];
+            while (true) {
+                try {
+                    if (fileInputStream != null && (read = fileInputStream.read(buffer)) == -1) break;
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                } // 1024바이트씩 계속 읽으면서 outputStream에 저장, -1이 나오면 더이상 읽을 파일이 없음
+                try {
+                    if (out != null) {
+                        out.write(buffer, 0, read);
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
                 }
-            } catch (IOException ex) {
-                ex.printStackTrace();
             }
         }
 
@@ -294,7 +307,6 @@ public class HomeController {
         ModelAndView mv = new ModelAndView();
         int boardNo = Integer.parseInt(request.getParameter("boardNo"));
         List<BoardVO> boardList = boardService.readBoard(boardNo);
-        boardService.readBoardHits(boardNo);
 
         HttpSession session = request.getSession(false);
         System.out.println(session);
@@ -316,26 +328,39 @@ public class HomeController {
 //        return "redirect:/home";
 //    }
     @PostMapping("/applyUpdate")
-    public String applyUpdate(@RequestParam("boardNo") int boardNo, BoardVO vo) {
+    public String applyUpdate(@RequestParam("boardNo") int boardNo,
+                              @RequestParam(value = "file", required = false) MultipartFile[] file,
+                              @RequestParam(value = "fileName") String originFile,
+                              BoardVO vo, HttpServletRequest request) {
+        AttachedFile af = new AttachedFile();
         vo.setBoardNo(boardNo);
+        vo.setFileName(originFile);
+        // file
+//        MultipartFile multipartFile = vo.getUploadFile();
+////        if (!multipartFile.isEmpty()) {
+////            String fileName = multipartFile.getOriginalFilename();
+////            try {
+////                multipartFile.transferTo(new File(uploadPath + fileName));
+////            } catch (IOException e) {
+////                e.printStackTrace();
+////            }
+////        }
+        // file=null
+        if (file!=null) {
+            af.uploadFile(file, request, vo);
+        }
+
         boardService.updateBoard(vo);
 
-        // file
-        MultipartFile multipartFile = vo.getUploadFile();
-        if (!multipartFile.isEmpty()) {
-            String fileName = multipartFile.getOriginalFilename();
-            try {
-                multipartFile.transferTo(new File(uploadPath + fileName));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         return "redirect:/home";
     }
 
     @GetMapping("/home/deleteBoard")
-    public String deleteBoard(@RequestParam("boardNo") int boardNo) {
+    public String deleteBoard(@RequestParam("boardNo") int boardNo, HttpServletRequest request) {
+        AttachedFile af = new AttachedFile();
+        String fileName = boardService.getFileName(boardNo);
         boardService.deleteBoard(boardNo);
+        af.deleteFile(request, fileName);
         return "redirect:/home";
     }
 }

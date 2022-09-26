@@ -19,5 +19,5 @@ public interface BoardMapper {
     int idCheck(String id);
 
     int listCount(BoardVO vo);
-
+    String getFileName(int boardNo);
 }

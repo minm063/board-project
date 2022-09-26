@@ -6,25 +6,28 @@
 <mapper namespace="com.example.board.home.impl.BoardMapper">
     <insert id="createBoard">
 --      게시글 번호, 제목, 내용, 등록일자, 조회수, 등록한 사용자명, 파일 이름(if exist)
-        INSERT INTO board VALUES(((SELECT IFNULL(MAX(boardNo),0) FROM board ALIAS_FOR_SUBQUERY)+1), #{title}, #{content}, NOW(), 0, #{boardName}, #{fileName})
+        INSERT INTO board_new VALUES(((SELECT IFNULL(MAX(boardNo),0) FROM board_new ALIAS_FOR_SUBQUERY)+1), #{title}, #{content}, NOW(), 0, #{boardName}, #{fileName})
     </insert>
     <select id="listBoard" resultType="com.example.board.home.impl.BoardVO">
 --         SELECT boardNo, title, regdate, hits, boardName FROM board
 --         SELECT A.* FROM (SELECT @ROWNUM:=@ROWNUM+1 AS ROWNUM, board.* FROM board, (SELECT @ROWNUM:=0) R ) A
-        SELECT A.* FROM (SELECT @ROWNUM:=@ROWNUM+1 AS ROWNUM, board.* FROM board, (SELECT @ROWNUM:=0) R ) A WHERE A.ROWNUM BETWEEN #{startRowNo} AND #{endRowNo}
+        SELECT A.* FROM (SELECT @ROWNUM:=@ROWNUM+1 AS ROWNUM, board_new.* FROM board_new, (SELECT @ROWNUM:=0) R ) A WHERE A.ROWNUM BETWEEN #{startRowNo} AND #{endRowNo}
     </select>
     <select id="readBoard" resultType="com.example.board.home.impl.BoardVO">
-        SELECT title, content, boardName, fileName FROM board WHERE boardNo=#{boardNo}
+        SELECT title, content, boardName, fileName FROM board_new WHERE boardNo=#{boardNo}
     </select>
     <update id="readBoardHits">
-        UPDATE board SET hits=hits+1 WHERE boardNo=#{boardNo}
+        UPDATE board_new SET hits=hits+1 WHERE boardNo=#{boardNo}
     </update>
     <update id="updateBoard">
-        UPDATE board SET title=#{title}, content=#{content} WHERE boardNo=#{boardNo}
+        UPDATE board_new SET title=#{title}, content=#{content}, fileName=#{fileName} WHERE boardNo=#{boardNo}
     </update>
     <delete id="deleteBoard">
-        DELETE FROM board WHERE boardNo=#{boardNo}
+        DELETE FROM board_new WHERE boardNo=#{boardNo}
     </delete>
+    <select id="getFileName" resultType="String">
+        SELECT fileName FROM board_new WHERE boardNo=#{boardNo}
+    </select>
 
     <!-- user -->
     <select id="loginUser" resultType="String" parameterType="String">
@@ -38,7 +41,7 @@
     </select>
 
     <select id="listCount" resultType="int">
-        SELECT COUNT(*) FROM board WHERE 1=1
+        SELECT COUNT(*) FROM board_new WHERE 1=1
         <!-- 검색 -->
     </select>
 

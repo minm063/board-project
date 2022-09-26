@@ -23,24 +23,24 @@ public class AttachedFile {
 
     private BasicFileAttributes attributes;
 
-    public void uploadFile(HttpServletRequest request, MultipartFile file) {
-        String temp = UUID.randomUUID().toString();
-        Path serverPath = Paths.get(request.getSession().getServletContext().getRealPath(File.separator) + File.separator
-                + "crud" + File.separator + temp + "_" + StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
-
-        if (!Files.exists(serverPath)) {
-            try {
-                Files.createDirectories(serverPath.getParent());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        try {
-            Files.copy(file.getInputStream(), serverPath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void uploadFile(HttpServletRequest request, MultipartFile file) {
+//        String temp = UUID.randomUUID().toString();
+//        Path serverPath = Paths.get(request.getSession().getServletContext().getRealPath(File.separator) + File.separator
+//                + "crud" + File.separator + temp + "_" + StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
+//
+//        if (!Files.exists(serverPath)) {
+//            try {
+//                Files.createDirectories(serverPath.getParent());
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        try {
+//            Files.copy(file.getInputStream(), serverPath, StandardCopyOption.REPLACE_EXISTING);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public void getFile(BoardVO vo, HttpServletRequest request) {
         System.out.println(vo.getFileName());
@@ -69,15 +69,44 @@ public class AttachedFile {
 //        }
     }
 
-    public void deleteFile(MultipartFile file, HttpServletRequest request)
-    {
-        Path serverPath = Paths.get(request.getSession().getServletContext().getRealPath(File.separator) + File.separator
-                + "crud" + File.separator + StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
-
-        try {
-            Files.deleteIfExists(serverPath);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void deleteFile(HttpServletRequest request, String names) {
+        // fileName:null
+        for (String fileName: names.split(",")) {
+            Path serverPath = Paths.get(request.getSession().getServletContext().getRealPath(File.separator) + File.separator
+                    + "crud" + File.separator + fileName);
+            try {
+                Files.deleteIfExists(serverPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    public void uploadFile(MultipartFile[] files, HttpServletRequest request, BoardVO vo) {
+        StringBuilder names = new StringBuilder();
+        if (vo.getFileName() != null) {
+            names.append(vo.getFileName());
+        }
+        for (MultipartFile file : files) {
+            String name = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path serverPath = Paths.get(request.getSession().getServletContext().getRealPath(File.separator) + File.separator
+                    + "crud" + File.separator + name);
+            System.out.println(serverPath);
+            if (!Files.exists(serverPath)) {
+                try {
+                    Files.createDirectories(serverPath.getParent());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                Files.copy(file.getInputStream(), serverPath, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            names.append(name).append(",");
+        }
+        vo.setFileName(names.toString());
+        System.out.println(names);
     }
 }
