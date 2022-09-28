@@ -17,14 +17,13 @@
 <body>
 <c:forEach items="${boardRead}" var="boardRead">
     <label for="boardRead" class="boardFooter">
-        <input type="text" value=${boardRead.title} readonly>
-        <input type="text" value=${boardRead.boardName} readOnly>
+        <input type="text" value="${boardRead.title}" readonly>
+        <input type="text" value="${boardRead.boardName}" readonly>
         <textarea cols="30" rows="10" id="boardRead" readonly>${boardRead.content}</textarea>
         <c:if test="${not empty boardRead.fileName}">
             <c:forEach var="fileNames" items="${fn:split(boardRead.fileName, ',')}">
                 <a href="${pageContext.request.contextPath}/home/fileDownload?fileName=${fileNames}">${fileNames}</a><br>
             </c:forEach>
-            <%--            <a href="http://localhost:8080/home/fileDownload" id="download">${boardRead.fileName}</a>--%>
         </c:if>
     </label>
     <c:set var="name" value="${boardRead.boardName}"/>

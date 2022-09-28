@@ -41,7 +41,7 @@ idCheck.addEventListener('blur', (event) => {
     let idValue = idCheck.value;
     let reId = /[a-z0-9-_]{4,19}$/g;
 
-    const id = $('#id').val();
+    const id = idCheck.value;
     $.ajax({
         url: './idCheck',
         type: 'post',

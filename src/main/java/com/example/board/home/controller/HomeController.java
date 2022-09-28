@@ -4,31 +4,22 @@ import com.example.board.home.AttachedFile;
 import com.example.board.home.impl.BoardServiceImpl;
 import com.example.board.home.impl.BoardVO;
 import com.google.common.hash.Hashing;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 @Controller
 public class HomeController {
-    @Resource(name = "uploadPath")
-    String uploadPath;
     private final BoardServiceImpl boardService;
 
     public HomeController(BoardServiceImpl boardService) {
@@ -40,7 +31,6 @@ public class HomeController {
 //                + "crud" + File.separator + name);
 //        return serverPath;
 //    }
-
 
     /*
     회원가입, 로그인
@@ -124,28 +114,26 @@ public class HomeController {
     @RequestMapping(value = "/home")
     public ModelAndView home(HttpServletRequest request, BoardVO vo) {
         ModelAndView mv = new ModelAndView();
-//            select 문에서 WHERE regDate>=date_add(now(), interval -1 day))인 boardNo
-//         뿌릴 때 if 문
-//         인자 넘겨서 ${not empty regDateMessage} =>
-        // signin
+
         HttpSession session = request.getSession(false);
         if (session != null) {
             // 로그인 되어있는 계정 name
             mv.addObject("user", session.getAttribute("id"));
         }
+
         // page
         int pageNo;
         try {
             pageNo = Integer.parseInt(request.getParameter("pageNo"));
-            System.out.println("try:"+pageNo);
+            System.out.println("try:" + pageNo);
         } catch (Exception e) {
             pageNo = 1;
         }
-        int totalCount = boardService.listCount(vo);
+        int totalCount = boardService.listCount(vo, vo.getNorm(), vo.getSearchInput());
         vo.setTotalCount(totalCount, pageNo);
         mv.addObject("page", vo);
-
-        List<BoardVO> boardList = boardService.listBoard(vo.getStartRowNo(), vo.getEndRowNo());
+        //
+        List<BoardVO> boardList = boardService.listBoard(vo.getStartRowNo(), vo.getEndRowNo(), vo.getNorm(), vo.getSearchInput());
         mv.addObject("boardList", boardList);
 
         mv.setViewName("home/index");
@@ -155,13 +143,12 @@ public class HomeController {
     @PostMapping("/home/pageSubmit")
     public List<BoardVO> pageSubmit(@RequestParam("data") int page, BoardVO vo) {
         vo.setPage(page);
-        return boardService.listBoard(vo.getStartRowNo(), vo.getEndRowNo());
+        return boardService.listBoard(vo.getStartRowNo(), vo.getEndRowNo(), vo.getNorm(), vo.getSearchInput());
     }
 
     // 작성 페이지
     @RequestMapping("/home/writeBoard")
     public String createBoard(HttpServletRequest request, Model model) {
-
         HttpSession session = request.getSession(false);
         if (session == null) {
             return "redirect:/";
@@ -174,12 +161,17 @@ public class HomeController {
 
     // 작성 확인
     @PostMapping("/home/applyInsert")
-    public ModelAndView insertBoard(BoardVO vo, @RequestParam(value = "uploadFile", required = false) MultipartFile[] file, HttpServletRequest request) {
+    public ModelAndView insertBoard(BoardVO vo, @RequestParam(value = "uploadFile", required = false) List<MultipartFile> files, HttpServletRequest request) {
         ModelAndView mv = new ModelAndView();
         AttachedFile af = new AttachedFile();
+//        for(MultipartFile file: files){
+//            if(file.isEmpty()){
+//
+//            }
+//        }
 
-        if (file != null) {
-            af.uploadFile(file, request, vo);
+        if (files.isEmpty()) {
+            af.uploadFile(files, request, vo);
 //            String name = UUID.randomUUID() + "_" + file.getOriginalFilename();
 //            Path serverPath = getPath(request, name);
 //            System.out.println(serverPath);
@@ -212,10 +204,13 @@ public class HomeController {
 //
 //            vo.setFileName(name);
         }
-
-        boardService.createBoard(vo);
-        mv.setViewName("redirect:/home");
-
+        if(vo.getTitle().isEmpty()) {
+            mv.setViewName("redirect:/home/writeBoard");
+        }
+        else {
+            boardService.createBoard(vo);
+            mv.setViewName("redirect:/home");
+        }
         return mv;
     }
 
@@ -262,7 +257,7 @@ public class HomeController {
 //        }
         String name = request.getParameter("fileName");
         String[] files = name.split(",");
-        for (String fileName: files) {
+        for (String fileName : files) {
 
             String path = Paths.get(request.getSession().getServletContext().getRealPath(File.separator) + File.separator
                     + "crud" + File.separator + fileName).toString();
@@ -329,7 +324,7 @@ public class HomeController {
 //    }
     @PostMapping("/applyUpdate")
     public String applyUpdate(@RequestParam("boardNo") int boardNo,
-                              @RequestParam(value = "file", required = false) MultipartFile[] file,
+                              @RequestParam(value = "file", required = false) List<MultipartFile> files,
                               @RequestParam(value = "fileName") String originFile,
                               BoardVO vo, HttpServletRequest request) {
         AttachedFile af = new AttachedFile();
@@ -346,8 +341,8 @@ public class HomeController {
 ////            }
 ////        }
         // file=null
-        if (file!=null) {
-            af.uploadFile(file, request, vo);
+        if (files.isEmpty()) {
+            af.uploadFile(files, request, vo);
         }
 
         boardService.updateBoard(vo);
@@ -360,7 +355,10 @@ public class HomeController {
         AttachedFile af = new AttachedFile();
         String fileName = boardService.getFileName(boardNo);
         boardService.deleteBoard(boardNo);
-        af.deleteFile(request, fileName);
+        if (fileName != null) {
+            af.deleteFile(request, fileName);
+        }
         return "redirect:/home";
     }
+
 }

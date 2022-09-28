@@ -18,6 +18,7 @@ public class BoardVO extends pageVO{
 
     // rowNum
     int ROWNUM;
+
     //
     MultipartFile uploadFile;
     String fileName;
@@ -30,6 +31,7 @@ public class BoardVO extends pageVO{
     String birth;
     String gender;
     String email;
+
 
     public BoardVO() {}
 

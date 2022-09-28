@@ -13,7 +13,24 @@ public class pageVO {
     private int startPageNo; // 시작 페이지 (페이징 네비 기준)
     private int endPageNo; // 끝 페이지 (페이징 네비 기준)
     private int totalCount; // 게시 글 전체 수
+    String norm;
+    String searchInput;
 
+    public String getNorm() {
+        return norm;
+    }
+
+    public void setNorm(String norm) {
+        this.norm = norm;
+    }
+
+    public String getSearchInput() {
+        return searchInput;
+    }
+
+    public void setSearchInput(String searchInput) {
+        this.searchInput = searchInput;
+    }
 
     public int getPageSize() {
         return pageSize;
@@ -116,8 +133,8 @@ public class pageVO {
     private void paging() {
         if (this.totalCount == 0) return;
         if (this.pageNo == 0) this.setPageNo(1);
-        if (this.pageSize == 0) this.setPageSize(12);
-        if (this.pageBlock == 0 ) this.setPageBlock(5);
+        if (this.pageSize == 0) this.setPageSize(10);
+        if (this.pageBlock == 0 ) this.setPageBlock(10);
 
         // 첫 페이지, 마지막 페이지
         int finalPage = (totalCount + (pageSize - 1)) / pageSize; // 마지막 페이지

@@ -16,6 +16,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -82,7 +83,7 @@ public class AttachedFile {
         }
     }
 
-    public void uploadFile(MultipartFile[] files, HttpServletRequest request, BoardVO vo) {
+    public void uploadFile(List<MultipartFile> files, HttpServletRequest request, BoardVO vo) {
         StringBuilder names = new StringBuilder();
         if (vo.getFileName() != null) {
             names.append(vo.getFileName());

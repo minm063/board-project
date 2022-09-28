@@ -16,8 +16,8 @@
 <body>
 <form action="${pageContext.request.contextPath}/home/applyInsert" method="post" enctype="multipart/form-data">
     <label class="boardFooter">
-        <input class="title" type="text" name="title" placeholder="title"/>
-        <input type="text" name="boardName" value=${user} readonly>
+        <input class="title" type="text" name="title" placeholder="title">
+        <input type="text" name="boardName" value="${user}" readonly>
         <textarea class="content" name="content" cols="50" rows="20" placeholder="input text"></textarea>
         <input type="file" name="uploadFile" multiple />
     </label>

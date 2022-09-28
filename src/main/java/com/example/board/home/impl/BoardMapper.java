@@ -8,7 +8,7 @@ import java.util.List;
 @Repository(value="BoardMapper")
 public interface BoardMapper {
     void createBoard(BoardVO vo);
-    List<BoardVO> listBoard(@Param("startRowNo") int startRowNo, @Param("endRowNo") int endRowNo);
+    List<BoardVO> listBoard(@Param("startRowNo") int startRowNo, @Param("endRowNo") int endRowNo, @Param("norm") String norm, @Param("searchInput") String searchInput);
     void updateBoard(BoardVO vo);
     void deleteBoard(int boardNo);
     List<BoardVO> readBoard(int boardNo);
@@ -18,6 +18,6 @@ public interface BoardMapper {
     void registerUser(BoardVO vo);
     int idCheck(String id);
 
-    int listCount(BoardVO vo);
+    int listCount(BoardVO vo, @Param("norm") String norm, @Param("searchInput") String searchInput);
     String getFileName(int boardNo);
 }
