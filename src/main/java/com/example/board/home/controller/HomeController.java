@@ -1,6 +1,7 @@
 package com.example.board.home.controller;
 
 import com.example.board.home.AttachedFile;
+import com.example.board.home.MailService;
 import com.example.board.home.impl.BoardServiceImpl;
 import com.example.board.home.impl.BoardVO;
 import com.google.common.hash.Hashing;
@@ -89,13 +90,21 @@ public class HomeController {
         return mv;
     }
 
+    @RequestMapping("/emailAuth")
+    @ResponseBody
+    public void emailAuth(String email) {
+        System.out.println("email: " + email);
+    }
+
     @PostMapping("/applyRegister")
     public ModelAndView applyRegister(BoardVO vo) {
         ModelAndView mv = new ModelAndView();
+        MailService mailService = new MailService();
         final String hashedPw = Hashing.sha256()
                 .hashString(vo.getPw(), StandardCharsets.UTF_8)
                 .toString();
         vo.setPw(hashedPw);
+
         boardService.registerUser(vo);
         mv.setViewName("redirect:/");
         return mv;

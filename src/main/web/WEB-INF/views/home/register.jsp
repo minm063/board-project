@@ -9,8 +9,7 @@
 <html>
 <head>
     <%--    <link rel="stylesheet" href="/static/index.css">--%>
-    <%--    <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>--%>
-    <meta charset="utf-8">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script><meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
@@ -88,13 +87,19 @@
                     </div>
                     <div class="col-12">
                         <label for="email" class="form-label">이메일</label>
-                        <p style="color: gray;">(선택 사항)</p>
                         <input type="email" id="email" name="email" class="form-control">
+                        <button id="auth" type="button">인증하기</button><br>
+                        <div id="authCheck" style="display: none;">
+                            <label for="authKey">
+                                <input type="text" placeholder="인증번호 6자리를 입력하세요." id="authKey" name="authKey" maxlength="6">
+                                <button type="button">확인</button>
+                            </label>
+                        </div>
                     </div>
                     <hr class="my-4">
                     <div>
                         <input class="btn btn-primary btn-lg" type="submit" value="가입하기" id="submit">
-                        <a href="/">
+                        <a href="${pageContext.request.contextPath}/">
                             <button type="button" class="btn btn-primary btn-lg">취소</button>
                         </a>
                     </div>
@@ -104,5 +109,5 @@
     </div>
 </div>
 </body>
-<script type="text/javascript" src="${pageContext.request.contextPath}/static/index.js?ver=1"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/static/index.js?ver=2"></script>
 </html>

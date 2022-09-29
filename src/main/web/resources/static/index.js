@@ -112,16 +112,6 @@ birth.addEventListener('blur', (event) => {
         flag4 = true;
     }
 });
-
-function submitCheck() {
-    if (flag1 && flag2 && flag3 && flag4) {
-        return true;
-    } else {
-        alert('필수 항목을 확인해주세요.');
-        return false;
-    }
-}
-
 //한글
 idCheck.addEventListener('keyup', (e) => {
     let targetValue = e.target.value;
@@ -143,14 +133,43 @@ openPw.addEventListener('click', (e) => {
         if (tEl.hasAttribute('activate')) {
             tEl.setAttribute('type', 'text');
             openPw.textContent = '비밀번호 숨기기';
-        }
-        else {
+        } else {
             tEl.setAttribute('type', 'password');
             openPw.textContent = '비밀번호 보이기';
         }
     })
 });
-//
-// document.querySelector('#back').addEventListener('click', (e) => {
-//
-// });
+const auth = document.querySelector('#auth');
+auth.addEventListener('click', (e) => {
+    const emailForm = /^[a-z][a-z0-9_.]*@[a-z].(com|co.kr)$/gm;
+    let ele = document.querySelector('#authCheck');
+    const email = $('#email').val();
+
+    if (!email.trim()) {
+        alert('이메일을 먼저 입력해주세요.');
+        ele.style.display = 'none';
+    } else if (!emailForm.test(email)) {
+        alert('이메일을 확인해주세요.')
+    } else {
+        ele.style.display = 'block';
+        // get email send mail
+
+        $.ajax({
+            type: 'GET',
+            url: "/emailAuth?email=" + email,
+            success: function (data) {
+                code = data;
+                alert('인증번호가 전송되었습니다.');
+            }
+        })
+    }
+});
+
+function submitCheck() {
+    if (flag1 && flag2 && flag3 && flag4) {
+        return true;
+    } else {
+        alert('필수 항목을 확인해주세요.');
+        return false;
+    }
+}

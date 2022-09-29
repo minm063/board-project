@@ -32,4 +32,5 @@
     <bean id="uploadPath" class="java.lang.String">
         <constructor-arg value="C:\projects\intelliJ-workspace\board\src\main\web\resources\upload-folder" />
     </bean>
+
 </beans>
