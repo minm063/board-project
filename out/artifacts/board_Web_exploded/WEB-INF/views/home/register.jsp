@@ -92,7 +92,7 @@
                         <div id="authCheck" style="display: none;">
                             <label for="authKey">
                                 <input type="text" placeholder="인증번호 6자리를 입력하세요." id="authKey" name="authKey" maxlength="6">
-                                <button type="button">확인</button>
+                                <button type="button" id="authButton">확인</button>
                             </label>
                         </div>
                     </div>
@@ -109,5 +109,5 @@
     </div>
 </div>
 </body>
-<script type="text/javascript" src="${pageContext.request.contextPath}/static/index.js?ver=2"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/static/index.js"></script>
 </html>

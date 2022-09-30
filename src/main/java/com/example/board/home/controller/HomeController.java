@@ -5,6 +5,7 @@ import com.example.board.home.MailService;
 import com.example.board.home.impl.BoardServiceImpl;
 import com.example.board.home.impl.BoardVO;
 import com.google.common.hash.Hashing;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Controller
 public class HomeController {
@@ -90,23 +92,34 @@ public class HomeController {
         return mv;
     }
 
+    @Autowired
+    private MailService mailService;
+
     @RequestMapping("/emailAuth")
     @ResponseBody
-    public void emailAuth(String email) {
+    public String emailAuth(String email) {
         System.out.println("email: " + email);
+        return mailService.mailForm(email);
     }
 
     @PostMapping("/applyRegister")
-    public ModelAndView applyRegister(BoardVO vo) {
+    public ModelAndView applyRegister(BoardVO vo, HttpServletRequest request) {
         ModelAndView mv = new ModelAndView();
-        MailService mailService = new MailService();
         final String hashedPw = Hashing.sha256()
                 .hashString(vo.getPw(), StandardCharsets.UTF_8)
                 .toString();
         vo.setPw(hashedPw);
 
-        boardService.registerUser(vo);
-        mv.setViewName("redirect:/");
+        String idPattern = "/[a-z0-9-_]{4,19}$/g";
+        String pwPattern = "/^(?=.*[a-zA-z])(?=.*[0-9])(?=.*[$`~!@$!%*#^?&\\\\(\\\\)\\-_=+]).{8,16}$/";
+
+        if (Pattern.matches(idPattern, vo.getId()) && Pattern.matches(pwPattern, vo.getPw())) { // 백단에서 유효성 검사 성공
+            boardService.registerUser(vo);
+            mv.setViewName("redirect:/");
+        } else { // 실패
+            System.out.println("try again");
+            mv.setViewName("redirect:"+request.getHeader("Register"));
+        }
         return mv;
     }
 
@@ -173,11 +186,6 @@ public class HomeController {
     public ModelAndView insertBoard(BoardVO vo, @RequestParam(value = "uploadFile", required = false) List<MultipartFile> files, HttpServletRequest request) {
         ModelAndView mv = new ModelAndView();
         AttachedFile af = new AttachedFile();
-//        for(MultipartFile file: files){
-//            if(file.isEmpty()){
-//
-//            }
-//        }
 
         if (files.isEmpty()) {
             af.uploadFile(files, request, vo);
@@ -213,10 +221,9 @@ public class HomeController {
 //
 //            vo.setFileName(name);
         }
-        if(vo.getTitle().isEmpty()) {
+        if (vo.getTitle().isEmpty()) {
             mv.setViewName("redirect:/home/writeBoard");
-        }
-        else {
+        } else {
             boardService.createBoard(vo);
             mv.setViewName("redirect:/home");
         }

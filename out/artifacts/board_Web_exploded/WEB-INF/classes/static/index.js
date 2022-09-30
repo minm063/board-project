@@ -7,6 +7,7 @@ const birth = document.querySelector('#birth');
 const hwp = /[^0-9a-zA-Z-_]/g;
 const openPw = document.querySelector('.viewPw');
 const togglePw = document.querySelectorAll('.togglePw');
+let code;
 // const hwp = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
 let flag1, flag2, flag3, flag4;
 // const submit = document.querySelector('#submit');
@@ -139,9 +140,10 @@ openPw.addEventListener('click', (e) => {
         }
     })
 });
+
 const auth = document.querySelector('#auth');
 auth.addEventListener('click', (e) => {
-    const emailForm = /^[a-z][a-z0-9_.]*@[a-z].(com|co.kr)$/gm;
+    const emailForm = /^[a-z][a-z0-9_.]*@(gmail|naver).com$/gm;
     let ele = document.querySelector('#authCheck');
     const email = $('#email').val();
 
@@ -160,16 +162,27 @@ auth.addEventListener('click', (e) => {
             success: function (data) {
                 code = data;
                 alert('인증번호가 전송되었습니다.');
+            },
+            error: function(data) {
+                alert('이메일 인증 오류');
+                console.log(data);
             }
         })
     }
 });
-
+const authButton = document.querySelector('#authButton');
+authButton.addEventListener('click', (e)=> {
+    if($('#authKey').val() === code){
+        alert('일치');
+    } else {
+        alert('불일치');
+    }
+});
 function submitCheck() {
     if (flag1 && flag2 && flag3 && flag4) {
         return true;
     } else {
         alert('필수 항목을 확인해주세요.');
-        return false;
+        return true;
     }
 }
