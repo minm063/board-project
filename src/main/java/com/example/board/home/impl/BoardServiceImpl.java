@@ -1,5 +1,6 @@
 package com.example.board.home.impl;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -10,6 +11,7 @@ public class BoardServiceImpl implements BoardMapper{
 
     @Resource(name = "BoardMapper")
     private BoardMapper boardMapper;
+
 
     @Override
     public String loginUser(BoardVO vo) {
@@ -31,8 +33,8 @@ public class BoardServiceImpl implements BoardMapper{
     }
 
     @Override
-    public List<BoardVO> listBoard() {
-        return boardMapper.listBoard();
+    public List<BoardVO> listBoard(@Param("startRowNo") int startRowNo, @Param("endRowNo") int endRowNo, @Param("norm") String norm, @Param("searchInput") String searchInput) {
+        return boardMapper.listBoard(startRowNo, endRowNo, norm, searchInput);
     }
 
     @Override
@@ -55,31 +57,11 @@ public class BoardServiceImpl implements BoardMapper{
         boardMapper.deleteBoard(boardNo);
     }
 
-//    @Autowired
-//    BoardDAO boardDAO;
-//
-//    @Override
-//    public void createBoard(BoardVO vo) {
-//        boardDAO.createBoard(vo);
-//    }
-//
-//    @Override
-//    public List<BoardVO> listBoard() {
-//        return boardDAO.listBoard();
-//    }
-//
-//    @Override
-//    public void updateBoard(BoardVO vo) {
-//        boardDAO.updateBoard(vo);
-//    }
-//
-//    @Override
-//    public void deleteBoard(BoardVO vo) {
-//        boardDAO.deleteBoard(vo);
-//    }
-//
-//    @Override
-//    public BoardVO readBoard(BoardVO vo) {
-//        return boardDAO.readBoard();
-//    }
+    @Override
+    public int listCount(BoardVO vo, @Param("norm") String norm, @Param("searchInput") String searchInput) {return boardMapper.listCount(vo, norm, searchInput);}
+
+    @Override
+    public String getFileName(int boardNo) {
+        return boardMapper.getFileName(boardNo);
+    }
 }

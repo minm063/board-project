@@ -1,6 +1,10 @@
 package com.example.board.home.impl;
 
-public class BoardVO {
+import org.springframework.web.multipart.MultipartFile;
+
+import java.sql.Date;
+
+public class BoardVO extends pageVO{
 
     /*
     crud board
@@ -8,10 +12,16 @@ public class BoardVO {
     int boardNo;
     String title;
     String content;
-    String regdate;
+    Date regdate;
     int hits;
     String boardName;
 
+    // rowNum
+    int ROWNUM;
+
+    //
+    MultipartFile uploadFile;
+    String fileName;
     /*
     user info
      */
@@ -22,7 +32,32 @@ public class BoardVO {
     String gender;
     String email;
 
+
     public BoardVO() {}
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public MultipartFile getUploadFile() {
+        return uploadFile;
+    }
+
+    public void setUploadFile(MultipartFile uploadFile) {
+        this.uploadFile = uploadFile;
+    }
+
+    public int getROWNUM() {
+        return ROWNUM;
+    }
+
+    public void setROWNUM(int ROWNUM) {
+        this.ROWNUM = ROWNUM;
+    }
 
     public String getBoardName() {
         return boardName;
@@ -92,7 +127,7 @@ public class BoardVO {
         this.content = content;
     }
 
-    public void setRegdate(String regdate) {
+    public void setRegdate(Date regdate) {
         this.regdate = regdate;
     }
 
@@ -112,7 +147,7 @@ public class BoardVO {
         return content;
     }
 
-    public String getRegdate() {
+    public Date getRegdate() {
         return regdate;
     }
 
